@@ -10,7 +10,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from .api import ObiEnergyTrackerAPI
-from .const import DOMAIN
+from .const import DOMAIN, OPTION_LAST_POWER_PROBE, OPTION_POWER_SOURCE
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -36,6 +36,9 @@ class ObiEnergyTrackerCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             config_entry=config_entry,
         )
         self.api = api
+        last_probe = config_entry.options.get(OPTION_LAST_POWER_PROBE)
+        if isinstance(last_probe, dict):
+            self.api.last_probe_summary = last_probe
 
     async def _async_update_data(self) -> dict[str, Any]:
         """Fetch data from API.
@@ -58,6 +61,14 @@ class ObiEnergyTrackerCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                 "Hourly data fetched: %s", "available" if hourly_data else "none"
             )
 
+            power = None
+            power_source = self.config_entry.options.get(OPTION_POWER_SOURCE)
+            if isinstance(power_source, dict):
+                power = await self.api.async_get_power_data(power_source)
+            _LOGGER.debug(
+                "Power data fetched: %s", "available" if power is not None else "none"
+            )
+
             _LOGGER.info(
                 "Successfully fetched data: meter=%s, hourly_days=%d",
                 "available" if meter else "none",
@@ -70,4 +81,5 @@ class ObiEnergyTrackerCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         return {
             "hourly": hourly_data,
             "meter": meter,
+            "power": power,
         }

@@ -17,7 +17,22 @@ I extracted the API Calls from the backend of the application, and created this 
 During setup, you'll need:
 - **Email**: Your "OBI" account email address
 - **Password**: Your "OBI" account password
-- **Country**: Country code (default## API Details & Credits
+- **Country**: Country code (default: `DE`)
+
+## Power endpoint probe
+
+After configuring the integration, call the Home Assistant service
+`obi_energy_tracker.probe_power_endpoints` with the integration's `entry_id`.
+It tests the known OBI Cloud endpoints and measures with the existing JWT login.
+Each request URL, query parameters, status and complete response body is available
+only when debug logging for `custom_components.obi_energy_tracker` is enabled.
+
+When a valid power source is found, the integration reloads and adds a `Power`
+sensor in watts. The generic `obi_energy_tracker.debug_get` service can be used
+to test another relative API path; it requires `entry_id`, `path`, and optionally
+`params`. Absolute URLs and query strings in `path` are rejected.
+
+## API Details & Credits
 
 ---
 

@@ -32,6 +32,9 @@
         "sensor": {
             "meter_reading": {
                 "name": "Meter Reading"
+            },
+            "power": {
+                "name": "Power"
             }
         }
     }

@@ -14,7 +14,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from . import ObiEnergyTrackerConfigEntry
-from .const import DOMAIN
+from .const import DOMAIN, OPTION_POWER_SOURCE
 from .coordinator import ObiEnergyTrackerCoordinator
 
 _LOGGER = logging.getLogger(__name__)
@@ -33,6 +33,8 @@ async def async_setup_entry(
     sensors = [
         ObiMeterReadingSensor(coordinator),
     ]
+    if isinstance(config_entry.options.get(OPTION_POWER_SOURCE), dict):
+        sensors.append(ObiPowerSensor(coordinator))
 
     async_add_entities(sensors)
 
@@ -107,4 +109,26 @@ class ObiMeterReadingSensor(ObiEnergySensorBase):
             if "value" in meter_data:
                 return meter_data["value"]
 
+        return None
+
+
+class ObiPowerSensor(ObiEnergySensorBase):
+    """Sensor for current active power from a confirmed OBI API source."""
+
+    _attr_unique_id = "obi_power"
+    _attr_device_class = SensorDeviceClass.POWER
+    _attr_state_class = SensorStateClass.MEASUREMENT
+    _attr_translation_key = "power"
+    _attr_native_unit_of_measurement = "W"
+
+    @property
+    def native_value(self) -> float | None:
+        """Return current active power in watts."""
+        if not self.coordinator.data:
+            return None
+        value = self.coordinator.data.get("power")
+        if isinstance(value, bool):
+            return None
+        if isinstance(value, (int, float)):
+            return float(value)
         return None

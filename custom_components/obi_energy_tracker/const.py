@@ -14,3 +14,7 @@ DEFAULT_SCAN_INTERVAL = 300  # 5 minutes
 # Data attributes
 ATTR_BRIDGE_ID = "bridge_id"
 ATTR_DEVICE_ID = "device_id"
+
+# Config-entry option keys
+OPTION_POWER_SOURCE = "power_source"
+OPTION_LAST_POWER_PROBE = "last_power_probe"

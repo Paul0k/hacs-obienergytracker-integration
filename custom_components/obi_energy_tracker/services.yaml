@@ -1,0 +1,27 @@
+debug_get:
+  name: Debug GET request
+  description: Send an authenticated GET request to a relative OBI Energy Tracker API path. Complete responses are written to the integration debug log only.
+  fields:
+    entry_id:
+      required: true
+      selector:
+        text:
+    path:
+      required: true
+      example: /bridges
+      selector:
+        text:
+    params:
+      required: false
+      example:
+        measures: power
+      selector:
+        object:
+probe_power_endpoints:
+  name: Probe power endpoints
+  description: Test known OBI endpoints and measures for a power value, then enable the power sensor when a source is found.
+  fields:
+    entry_id:
+      required: true
+      selector:
+        text:

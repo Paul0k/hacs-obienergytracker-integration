@@ -32,8 +32,10 @@
     "sensor": {
       "meter_reading": {
         "name": "Zählerstand"
+      },
+      "power": {
+        "name": "Leistung"
       }
     }
   }
 }
-
