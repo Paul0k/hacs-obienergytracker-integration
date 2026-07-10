@@ -9,7 +9,7 @@ import voluptuous as vol
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_EMAIL, CONF_PASSWORD, Platform
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .api import ObiEnergyTrackerAPI
@@ -86,10 +86,18 @@ def _async_register_services(hass: HomeAssistant) -> None:
     if hass.services.has_service(DOMAIN, SERVICE_DEBUG_GET):
         return
 
+    async def async_handle_debug_get(call: ServiceCall) -> None:
+        """Handle the debug GET service call."""
+        await _async_handle_debug_get(hass, dict(call.data))
+
+    async def async_handle_probe_power_endpoints(call: ServiceCall) -> None:
+        """Handle the power endpoint probe service call."""
+        await _async_handle_probe_power_endpoints(hass, dict(call.data))
+
     hass.services.async_register(
         DOMAIN,
         SERVICE_DEBUG_GET,
-        lambda call: _async_handle_debug_get(hass, dict(call.data)),
+        async_handle_debug_get,
         schema=vol.Schema(
             {
                 vol.Required(SERVICE_ENTRY_ID): str,
@@ -101,7 +109,7 @@ def _async_register_services(hass: HomeAssistant) -> None:
     hass.services.async_register(
         DOMAIN,
         SERVICE_PROBE_POWER_ENDPOINTS,
-        lambda call: _async_handle_probe_power_endpoints(hass, dict(call.data)),
+        async_handle_probe_power_endpoints,
         schema=vol.Schema({vol.Required(SERVICE_ENTRY_ID): str}),
     )
 
